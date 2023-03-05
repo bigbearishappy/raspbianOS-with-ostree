@@ -8,8 +8,8 @@ OSTREE_SYSROOT=${BUILDDIR}
 # TODO add a remote URL
 #OSTREE_URL=https://www.example.com
 OSTREE_BRANCH_DEPLOY=${OSTREE_BRANCH}
-OSTREE_REPODIR=/home/seeed/ostree/bbb-ostree-helper-scripts/repo
-OSTREE_OS=${OSTREE_OS:=debian}
+OSTREE_REPODIR=/host/repo
+OSTREE_OS=${OSTREE_OS:=raspbian}
 REPOPATH=${OSTREE_SYSROOT}/ostree/repo
 BOOT=${OSTREE_SYSROOT}/boot
 
@@ -25,27 +25,16 @@ echo $OSTREE_SYSROOT
 # it complains if there is no uEnv.txt file.
 mkdir -p $BUILDDIR/boot/loader.0
 cd $BUILDDIR/boot
-cp /home/seeed/ostree/bbb-ostree-helper-scripts/boot.scr .
 ln -s loader.0 loader
-touch $BUILDDIR/boot/loader/uEnv.txt
+#touch $BUILDDIR/boot/loader/uEnv.txt
 
 ostree admin init-fs "${OSTREE_SYSROOT}"
 ostree admin --sysroot="${OSTREE_SYSROOT}" os-init ${OSTREE_OS}
-#ostree --repo="${REPOPATH}" remote add ${OSTREE_OS} ${OSTREE_URL} ${OSTREE_BRANCH_DEPLOY}
-#ostree --repo="${REPOPATH}" pull ${OSTREE_OS}:${OSTREE_BRANCH_DEPLOY}
 ostree --repo="${REPOPATH}" pull-local --disable-fsync --remote=${OSTREE_OS} ${OSTREE_REPODIR} ${OSTREE_BRANCH_DEPLOY}
 ostree --repo="${REPOPATH}" config set sysroot.bootloader uboot
 
-uuid=$(uuid)
-kargs=(--karg=rw --karg=splash --karg=plymouth.ignore-serial-consoles)
+kargs=(--karg=root=LABEL=rootfs --karg=rw)
 ostree admin --sysroot="${OSTREE_SYSROOT}" deploy --os=${OSTREE_OS} "${kargs[@]}" ${OSTREE_BRANCH_DEPLOY}
-
-# output the parameter for u-boot
-echo ------------------------------
-ls -l ${BUILDDIR}/boot/ostree/*/
-echo ++++++++++++++++++++++++++++++
-ls -l ${BUILDDIR}/ostree/*/
-echo ------------------------------
 
 # Once these are setup, they shouldn't need to change
 cd $BUILDDIR/boot
@@ -68,4 +57,3 @@ mkdir -p ${BUILDDIR} /run/media/usb7
 
 #mkdir /tmp/ostree_rootfs
 #cp -r ${BUILDDIR}/* /tmp/ostree_rootfs
-cd /home/seeed/ostree/bbb-ostree-helper-scripts
