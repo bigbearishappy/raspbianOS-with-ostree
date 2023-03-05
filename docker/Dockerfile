@@ -4,4 +4,8 @@ RUN apt-get update && apt-get install -y git m4 dosfstools kpartx wget parted cu
 
 RUN apt-get install -y ostree
 
+RUN build-u-boot.sh
+
+RUN build-ostree.sh
+
 ENTRYPOINT [ "/host/entrypoint.sh" ]
