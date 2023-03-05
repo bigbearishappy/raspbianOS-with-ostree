@@ -67,6 +67,25 @@ chroot_umount () {
   fi
 }
 
+#build ostree if needed
+if [ ! -f /host/ostree-with-dracut.tar.gz ]
+then
+echo ostree install file not exist, build it now...
+cd /tmp
+git clone https://github.com/ostreedev/ostree.git --depth=1
+
+cd ostree
+git submodule update --init
+env NOCONFIGURE=1 ./autogen.sh
+./configure --with-dracut
+
+make -j`nproc`
+
+mkdir -p /tmp/ostree-with-dracut
+make install DESTDIR=/tmp/ostree-with-dracut
+tar zcf /host/ostree-with-dracut.tar.gz /tmp/ostree-with-dracut
+fi
+
 cat > "${BUILDDIR}/chroot_script.sh" <<-__EOF__
 ls -l /usr/bin/apt-get
 apt-get update
@@ -81,14 +100,14 @@ apt-get install -y ostree
 # remove ostree so only dependencies are left
 apt-get purge -y ostree libostree-1-1
 
-cd /tmp
+cd /home
 
-tar xzf ostree-withdracut.tar.gz
-cd ostree-withdracut
+tar xzf ostree-with-dracut.tar.gz
+cd ostree-with-dracut
 cp -r * /
 cd ..
-rm -r ostree-withdracut
-ls -l /usr/lib/dracut/modules.d/98ostree/
+rm -r ostree-with-dracut
+#ls -l /usr/lib/dracut/modules.d/98ostree/
 rm ostree-withdracut.tar.gz
 
 dracut --force --no-compress --add ostree /boot/initrd.img-$KERNEL_VERSION $KERNEL_VERSION
@@ -112,8 +131,7 @@ if [ ! -n "${QEMU}" ]; then
   echo "qemu-user-static package must be installed"
 fi
 
-cp /home/seeed/ostree/bbb-ostree-helper-scripts/kernel8.img ${BUILDDIR}/boot 
-
+cp /host/ostree-with-dracut.tar.gz $BUILDDIR/home
 cp $QEMU ${BUILDDIR}/usr/bin
 cp --remove-destination /etc/resolv.conf ${BUILDDIR}/etc/resolv.conf
 ls -l ${BUILDDIR}/usr/bin | grep qemu
