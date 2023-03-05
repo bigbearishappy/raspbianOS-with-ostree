@@ -29,6 +29,11 @@ mount /dev/mapper/${LOOP_NUM}p1 $ROOTDIR
 
 cp $ROOTDIR/kernel8.img $BUILDDIR/boot/
 
-export UNAME_R=$(grep "uname_r=" ${BUILDDIR}/boot/uEnv.txt)
-export KERNEL_VERSION=$(echo "${UNAME_R/uname_r=}")
+# get the kernel version from kernel image
+KERNEL_IMG=$BUILDDIR/boot/kernel8.img
+IMG_OFFSET=$(LC_ALL=C grep -abo $'\x1f\x8b\x08\x00' $KERNEL_IMG | head -n 1 | cut -d ':' -f 1)
 
+export KERNEL_VERSION=$(dd if=$KERNEL_IMG obs=64K ibs=4 skip=$(( IMG_OFFSET / 4)) 2>/dev/null | zcat | grep -a -m1 "Linux version" | strings | awk '{ print $3; }')
+export UNAME_R=$KERNEL_VERSION
+
+echo current target image kernel version:$KERNEL_VERSION
