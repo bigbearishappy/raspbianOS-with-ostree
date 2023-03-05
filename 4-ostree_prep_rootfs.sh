@@ -68,10 +68,7 @@ cd /tmp
 
 # This is in here so ostree doesn't complain about the kernel 
 # when doing "ostree admin deploy"
-# TODO - develop a specialized Beaglebone ostree bootloader deployment
 cd ${BUILDDIR}
-mkdir -p usr/lib/modules/$KERNEL_VERSION/dtb/broadcom/
-cp $ROOTDIR/bcm2711-rpi-4-b.dtb usr/lib/modules/$KERNEL_VERSION/dtb/broadcom/
 cp boot/kernel8.img usr/lib/modules/$KERNEL_VERSION/vmlinuz
 cp boot/initrd.img-$KERNEL_VERSION usr/lib/modules/$KERNEL_VERSION/initramfs.img
 CHECKSUM=$(cat boot/kernel8.img boot/initrd.img-$KERNEL_VERSION | sha256sum | head -c 64)
@@ -79,7 +76,6 @@ rm boot/kernel8.img
 rm boot/initrd.img-$KERNEL_VERSION
 
 
-REPO=/home/seeed/ostree/bbb-ostree-helper-scripts/repo
 if [ ! -d "$REPO" ]; then
   ostree --repo="$REPO" init --mode=archive-z2
 fi
@@ -89,4 +85,3 @@ ostree summary --repo="$REPO" --update
 # Remove rootfs so ostree_client_setup.sh can replace them 
 rm -r ${BUILDDIR}/*
 
-cd /home/seeed/ostree/bbb-ostree-helper-scripts
