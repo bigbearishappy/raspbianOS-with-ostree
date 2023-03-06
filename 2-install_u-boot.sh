@@ -4,16 +4,18 @@ echo build and install u-boot...
 
 if [ ! -f /host/u-boot.bin ]
 then
-apt -y build-dep u-boot
+#apt -y build-dep u-boot
+#apt install -y flex libssl-dev
 echo u-boot.bin not exist, build it now ...
 cd /tmp
 
-git clone git://git.denx.de/u-boot.git --depth=1
+#git clone git://git.denx.de/u-boot.git --depth=1
+git clone https://github.com/u-boot/u-boot.git --depth=1
 
 cd u-boot
 
 make CROSS_COMPILE=aarch64-linux-gnu- rpi_4_defconfig
-make -j`nproc`
+make CROSS_COMPILE=aarch64-linux-gnu- -j`nproc`
 cp u-boot.bin /host
 fi
 
