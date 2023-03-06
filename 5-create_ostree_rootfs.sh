@@ -26,7 +26,7 @@ echo $OSTREE_SYSROOT
 mkdir -p $BUILDDIR/boot/loader.0
 cd $BUILDDIR/boot
 ln -s loader.0 loader
-#touch $BUILDDIR/boot/loader/uEnv.txt
+touch $BUILDDIR/boot/loader/uEnv.txt
 
 ostree admin init-fs "${OSTREE_SYSROOT}"
 ostree admin --sysroot="${OSTREE_SYSROOT}" os-init ${OSTREE_OS}
