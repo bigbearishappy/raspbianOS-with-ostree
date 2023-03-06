@@ -75,7 +75,7 @@ CHECKSUM=$(cat boot/kernel8.img boot/initrd.img-$KERNEL_VERSION | sha256sum | he
 rm boot/kernel8.img
 rm boot/initrd.img-$KERNEL_VERSION
 
-
+REPO=/host/repo
 if [ ! -d "$REPO" ]; then
   ostree --repo="$REPO" init --mode=archive-z2
 fi
