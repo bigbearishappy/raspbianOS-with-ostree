@@ -77,13 +77,17 @@ git clone https://github.com/ostreedev/ostree.git --depth=1
 cd ostree
 git submodule update --init
 env NOCONFIGURE=1 ./autogen.sh
-./configure --with-dracut
+./configure --with-dracut --prefix /usr
 
 make -j`nproc`
 
 mkdir -p /tmp/ostree-with-dracut
 make install DESTDIR=/tmp/ostree-with-dracut
-tar zcf /host/ostree-with-dracut.tar.gz /tmp/ostree-with-dracut
+cd /tmp/ostree-with-dracut
+cp -r lib/* usr/lib
+rm -rf lib
+cd /tmp
+tar zcf /host/ostree-with-dracut.tar.gz ostree-with-dracut
 fi
 
 cat > "${BUILDDIR}/chroot_script.sh" <<-__EOF__
@@ -108,7 +112,7 @@ cp -r * /
 cd ..
 rm -r ostree-with-dracut
 #ls -l /usr/lib/dracut/modules.d/98ostree/
-rm ostree-withdracut.tar.gz
+rm ostree-with-dracut.tar.gz
 
 dracut --force --no-compress --add ostree /boot/initrd.img-$KERNEL_VERSION $KERNEL_VERSION
 
@@ -118,6 +122,7 @@ rm /usr/bin/qemu-aarch64-static
 #rm /etc/resolv.conf
 #ln -s  /run/connman/resolv.conf /etc/resolv.conf
 
+apt-get autoremove -y dracut
 apt-get clean
 
 rm /chroot_script.sh
