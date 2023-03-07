@@ -93,7 +93,7 @@ fi
 cat > "${BUILDDIR}/chroot_script.sh" <<-__EOF__
 ls -l /usr/bin/apt-get
 apt-get update
-apt-get install -y dracut
+apt-get install -y dracut zstd
 
 # install ostree and it's dependencies
 # CAREFUL - we're building from source
@@ -114,7 +114,7 @@ rm -r ostree-with-dracut
 #ls -l /usr/lib/dracut/modules.d/98ostree/
 rm ostree-with-dracut.tar.gz
 
-dracut --force --no-compress --add ostree /boot/initrd.img-$KERNEL_VERSION $KERNEL_VERSION
+dracut --force --no-early-microcode --zstd --add ostree /boot/initrd.img-$KERNEL_VERSION $KERNEL_VERSION
 
 rm -rf /usr/etc
 
@@ -122,7 +122,7 @@ rm /usr/bin/qemu-aarch64-static
 #rm /etc/resolv.conf
 #ln -s  /run/connman/resolv.conf /etc/resolv.conf
 
-apt-get autoremove -y dracut
+apt-get autoremove -y dracut zstd
 apt-get clean
 
 rm /chroot_script.sh
