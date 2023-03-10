@@ -104,6 +104,9 @@ apt-get install -y ostree
 # remove ostree so only dependencies are left
 apt-get purge -y ostree libostree-1-1
 
+apt-get install -y raspberrypi-ui-mods
+dpkg -l | grep raspberrypi-ui-mods
+
 cd /home
 
 tar xzf ostree-with-dracut.tar.gz
@@ -115,6 +118,25 @@ rm -r ostree-with-dracut
 rm ostree-with-dracut.tar.gz
 
 dracut --force --no-early-microcode --zstd --add ostree /boot/initrd.img-$KERNEL_VERSION $KERNEL_VERSION
+
+# add default user
+echo start create default user
+deluser --remove-home rpi-first-boot-wizard 
+deluser --remove-home pi
+echo remove user done
+adduser pi <<EOF
+raspberry
+raspberry
+
+
+
+
+
+
+
+
+EOF
+echo create default user pi done
 
 rm -rf /usr/etc
 
