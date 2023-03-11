@@ -107,6 +107,11 @@ apt-get purge -y ostree libostree-1-1
 apt-get install -y raspberrypi-ui-mods
 dpkg -l | grep raspberrypi-ui-mods
 
+# prepare the docker env for user app
+apt-get install -y jq
+apt-get autoremove -y binutils-aarch64-linux-gnu build-essential binutils-common dkms
+apt-get install -y docker.io && curl -L https://github.com/docker/compose/releases/download/v2.15.1/docker-compose-linux-aarch64 >/usr/bin/docker-compose && chmod +x /usr/bin/docker-compose
+
 cd /home
 
 tar xzf ostree-with-dracut.tar.gz

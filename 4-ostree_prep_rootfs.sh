@@ -51,6 +51,8 @@ d /sysroot/home 0755 root root -
 d /sysroot/root 0700 root root -
 d /run/media 0755 root root -
 L /var/lib/dpkg - - - - ../../usr/share/dpkg/database
+d /var/config 0755 root root -
+d /var/seeed 0755 root root -
 EOF
 
 mkdir -p sysroot
@@ -63,8 +65,12 @@ ln -s /sysroot/home home
 ln -s /sysroot/root root
 ln -s /run/media media
 
+# prepare the directory for user app
+mkdir -p var/config
+ln -s var/config config
+mkdir -p var/seeed
+ln -s var/seeed seeed
 
-cd /tmp 
 
 # This is in here so ostree doesn't complain about the kernel 
 # when doing "ostree admin deploy"
